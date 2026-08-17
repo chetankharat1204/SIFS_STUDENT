@@ -1,0 +1,187 @@
+/* index.css - KEEP THIS EXACTLY AS IS */
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import "tailwindcss";
+
+:root {
+  --body-bg: #ffffff;
+  --body-text: #0f172a;
+  --card-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+  --body-bg: #0b1220;
+  --body-text: #e6eef8;
+  --card-bg: #192840;
+}
+
+body {
+  font-family: 'Mulish', sans-serif;
+  background-color: var(--body-bg) !important;
+  color: var(--body-text) !important;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.card,
+.panel,
+.container {
+  background-color: var(--card-bg);
+}
+
+.custom-scrollbar {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ff0000 #f5f5f5;
+  padding-right: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #ff0000;
+}
+
+.custom-scrollbar::-webkit-scrollbar-button:vertical:start:decrement,
+.custom-scrollbar::-webkit-scrollbar-button:vertical:end:increment,
+.custom-scrollbar::-webkit-scrollbar-button:horizontal:start:decrement,
+.custom-scrollbar::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.menu-border {
+  position: relative;
+}
+
+.menu-border::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  width: 50%;
+  margin: 0 auto;
+  border-radius: 2px;
+  height: 3px;
+  background-color: white;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Rich Text Content Styling (for WYSIWYG editor output) */
+.rich-text-content {
+  line-height: 1.6;
+  font-size: 0.875rem;
+  /* Equivalent to text-sm */
+}
+
+.rich-text-content p {
+  margin-bottom: 1rem;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+}
+
+.rich-text-content li {
+  margin-bottom: 0.5rem;
+}
+
+.rich-text-content b,
+.rich-text-content strong {
+  font-weight: 700;
+}
+
+.rich-text-content i,
+.rich-text-content em {
+  font-style: italic;
+}
+
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3,
+.rich-text-content h4 {
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text-content h1 {
+  font-size: 1.5rem;
+}
+
+.rich-text-content h2 {
+  font-size: 1.25rem;
+}
+
+.rich-text-content h3 {
+  font-size: 1.125rem;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.rich-text-content hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.rich-text-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  font-style: italic;
+  margin: 1rem 0;
+  color: #64748b;
+}
+
+[data-theme="dark"] .rich-text-content hr {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .rich-text-content blockquote {
+  border-left-color: #2563eb;
+  color: #94a3b8;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
