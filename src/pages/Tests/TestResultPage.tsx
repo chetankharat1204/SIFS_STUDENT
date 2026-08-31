@@ -236,7 +236,6 @@ const QuestionHeader = ({
   text,
   isExpanded,
   onClick,
-  isMCQ = false,
   isAttempted = true,
   isDark = false
 }: {
@@ -244,7 +243,6 @@ const QuestionHeader = ({
   text: string;
   isExpanded: boolean;
   onClick: () => void;
-  isMCQ?: boolean;
   isAttempted?: boolean;
   isDark?: boolean;
 }) => {
@@ -261,17 +259,17 @@ const QuestionHeader = ({
   return (
     <div
       onClick={onClick}
-      className={`font-semibold text-base leading-snug tracking-normal mb-2 rounded-md flex items-start justify-between py-4 px-4 cursor-pointer select-none transition-colors border ${headerClasses}`}
+      className={`font-semibold text-[15px] sm:text-base leading-relaxed tracking-normal mb-2 rounded-md flex items-start justify-between py-3.5 px-4 sm:px-5 cursor-pointer select-none transition-colors border ${headerClasses}`}
     >
-      <div className={`flex flex-1 pr-4 ${isMCQ ? "text-sm" : "text-sm"}`}>
-        <div className="flex-shrink-0 mr-1.5 whitespace-nowrap">Q.{qId}</div>
-        <div className="flex-1 text-left">{text}</div>
+      <div className="flex items-start flex-1 min-w-0 pr-3 sm:pr-4">
+        <span className="flex-shrink-0 font-bold mr-2 whitespace-nowrap">Q.{qId}</span>
+        <span className="flex-1 text-left break-words leading-relaxed font-medium">{text}</span>
       </div>
       <div className="flex items-center gap-3 flex-shrink-0 mt-0.5">
         {/* Not Attempted badge on collapsed header */}
         {!isAttempted && !isExpanded && (
           <span
-            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isDark
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${isDark
               ? "bg-orange-900/40 text-orange-300 border border-orange-700"
               : "bg-orange-100 text-orange-700 border border-orange-300"
               }`}
@@ -814,7 +812,6 @@ export default function TestResultPage() {
                     text={q.text}
                     isExpanded={isExpanded}
                     onClick={() => handleToggle(q.id || index + 1)}
-                    isMCQ={isMCQ}
                     isAttempted={q.isAttempted}
                     isDark={isDark}
                   />
