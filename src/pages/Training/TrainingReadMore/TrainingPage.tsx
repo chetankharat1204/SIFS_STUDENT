@@ -495,22 +495,44 @@ export default function TrainingPage({ trainingId: propTrainingId }: { trainingI
         const videoId = getYouTubeId(url);
         if (videoId) {
           return `<button 
+            type="button"
             onclick="window.openVideo('${videoId}')" 
-            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-colors my-1 cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm hover:shadow transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-circle"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-            Watch Recording
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-circle flex-shrink-0"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            <span>Watch Recording</span>
           </button>`;
         }
         return match;
       });
     }
 
+    // Clean up unwanted <hr>, <br>, <p> borders and wrap buttons in flex container inside table cells
+    if (processedHtml.includes('<td')) {
+      processedHtml = processedHtml.replace(/<td([^>]*)>([\s\S]*?)<\/td>/gi, (_match, attrs, content) => {
+        if (content.includes('Watch Recording') || content.includes('openVideo')) {
+          const cleanedContent = content
+            .replace(/<hr\s*\/?>/gi, '')
+            .replace(/<br\s*\/?>/gi, ' ')
+            .replace(/<\/?p[^>]*>/gi, ' ')
+            .trim();
+          return `<td${attrs}><div class="recording-btn-group flex flex-wrap items-center gap-2.5">${cleanedContent}</div></td>`;
+        }
+        return `<td${attrs}>${content}</td>`;
+      });
+    }
+
+    // Wrap bare tables in responsive container if not already wrapped
+    if (processedHtml.includes('<table') && !processedHtml.includes('table-container')) {
+      processedHtml = processedHtml.replace(/<table/gi, '<div class="table-container"><table');
+      processedHtml = processedHtml.replace(/<\/table>/gi, '</table></div>');
+    }
+
     return (
       <div 
         key={idx} 
         dangerouslySetInnerHTML={{ __html: processedHtml }} 
-        className="leading-relaxed text-sm youtube-enhanced-content" 
+        className="leading-relaxed text-sm youtube-enhanced-content w-full" 
       />
     );
   };
@@ -953,7 +975,7 @@ export default function TrainingPage({ trainingId: propTrainingId }: { trainingI
               {currentModule?.icon}
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               {currentTopic ? (
                 <>
                   <h4 className={`font-semibold mb-4 text-lg ${isDark ? "text-white" : "text-slate-800"
@@ -1078,8 +1100,8 @@ export default function TrainingPage({ trainingId: propTrainingId }: { trainingI
                   />
                 ) : (
                   <div className={`p-3 border rounded-md min-h-20 ${isDark
-                    ? "bg-gray-700 border-gray-600 text-gray-300"
-                    : "bg-gray-50 border-gray-300 text-gray-700"
+                    ? "bg-gray-700 border-gray-600 text-white"
+                    : "bg-gray-50 border-gray-300 text-gray-900"
                     }`}>
                     {noteContent || "No notes added yet."}
                   </div>
@@ -1104,6 +1126,81 @@ export default function TrainingPage({ trainingId: propTrainingId }: { trainingI
           margin-right: auto;
           max-width: 100%;
           height: auto;
+        }
+        /* Modern Table Styles for Rich Text Content */
+        .training-content table {
+          width: 100% !important;
+          min-width: 100% !important;
+          border-collapse: collapse !important;
+          margin: 0 !important;
+          font-size: 0.9rem;
+          text-align: left;
+        }
+        .training-content .table-container,
+        .training-content figure.table {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.625rem;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+          background-color: #ffffff;
+        }
+        .training-content th, .training-content td {
+          border: 1px solid #e2e8f0;
+          padding: 0.85rem 1.25rem;
+          text-align: left;
+          vertical-align: middle;
+        }
+        .training-content th {
+          background-color: #f8fafc;
+          font-weight: 600;
+          color: #1e293b;
+          letter-spacing: 0.02em;
+          border-bottom: 2px solid #e2e8f0;
+        }
+        .training-content tbody tr:nth-child(even) td {
+          background-color: #fbfcfe;
+        }
+        .training-content tbody tr:hover td {
+          background-color: #f1f5f9;
+        }
+        .training-content td hr {
+          display: none !important;
+        }
+        .training-content td .recording-btn-group {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.625rem;
+        }
+        .training-content td button,
+        .training-content td a {
+          display: inline-flex;
+          align-items: center;
+          margin: 0 !important;
+        }
+        /* Dark mode overrides */
+        .dark .training-content .table-container,
+        .dark .training-content figure.table {
+          border-color: #374151;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+          background-color: #1f2937;
+        }
+        .dark .training-content th, .dark .training-content td {
+          border-color: #374151;
+        }
+        .dark .training-content th {
+          background-color: #111827;
+          color: #f3f4f6;
+          border-bottom: 2px solid #4b5563;
+        }
+        .dark .training-content tbody tr:nth-child(even) td {
+          background-color: rgba(17, 24, 39, 0.4);
+        }
+        .dark .training-content tbody tr:hover td {
+          background-color: #374151;
         }
       `}</style>
     </div>

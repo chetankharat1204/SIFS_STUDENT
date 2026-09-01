@@ -106,17 +106,6 @@ export const AssignmentPage: React.FC = () => {
     return `${s} - ${e}`;
   };
 
-  // Helper function to determine status
-  const getStatus = (status: any, isCompleted: boolean, isSubmitted: boolean): Assignment["status"] => {
-    const statusStr = status !== undefined && status !== null ? String(status).toLowerCase() : "";
-    if (isCompleted || statusStr === "completed" || statusStr === "complete") {
-      return "Complete";
-    }
-    if (isSubmitted || statusStr === "submitted" || statusStr === "pending") {
-      return "Pending";
-    }
-    return "Not Attempted";
-  };
 
   // Fetch all assignments
   const fetchAssignments = async () => {
@@ -136,12 +125,20 @@ export const AssignmentPage: React.FC = () => {
       if (data?.success && data.data) {
         const assignmentList = data.data.data || data.data.assignments || [];
         const transformed = assignmentList.map((item: any) => {
-          const hasAttempt = item.question_attempt && item.question_attempt.length > 0;
-          const status = getStatus(
-            item.assignment_status || item.status,
-            item.is_completed || item.is_checked === 1,
-            item.is_submitted || hasAttempt
-          );
+          const rawStatus = (item.assignment_status || "").toLowerCase();
+          const isComplete = rawStatus === "completed" || rawStatus === "complete" || item.is_completed || item.is_checked === 1 || item.status === 1;
+          const isUpcoming = (item.start_date || item.date) ? new Date(item.start_date || item.date) > new Date() : false;
+          const isDateExpired = (item.end_date || item.due_date) ? new Date(item.end_date || item.due_date) < new Date() : false;
+          const isExpired = !isComplete && (rawStatus === "expired" || rawStatus === "inactive" || (rawStatus !== "active" && isDateExpired));
+
+          let status: Assignment["status"] = "Pending";
+          if (isComplete) {
+            status = "Complete";
+          } else if (isExpired) {
+            status = "Not Attempted";
+          } else {
+            status = "Pending";
+          }
 
           return {
             id: item.id?.toString() || item.assignment_id?.toString() || Math.random().toString(),
@@ -152,8 +149,9 @@ export const AssignmentPage: React.FC = () => {
             original_date: item.end_date || item.due_date || item.date, // Store raw date
             comment: item.comment || "NA",
             status: status,
-            isExpired: (item.end_date || item.due_date) ? new Date(item.end_date || item.due_date) < new Date() : false,
-            isUpcoming: (item.start_date || item.date) ? new Date(item.start_date || item.date) > new Date() : false
+            assignment_status: item.assignment_status,
+            isExpired: isExpired,
+            isUpcoming: isUpcoming && !isComplete
           };
         }) || [];
 
@@ -161,7 +159,7 @@ export const AssignmentPage: React.FC = () => {
         if (data.data.pagination?.total_pages) {
           setTotalPages(data.data.pagination.total_pages);
         }
-        if (data.data.pagination?.total) {
+        if (data.data.pagination?.total !== undefined) {
           setTotalItems(data.data.pagination.total);
         } else {
           setTotalItems(transformed.length);
