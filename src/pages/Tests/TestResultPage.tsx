@@ -230,7 +230,6 @@ const MCQResult = ({
   );
 };
 
-// --- QuestionHeader with dark mode ---
 const QuestionHeader = ({
   qId,
   text,
