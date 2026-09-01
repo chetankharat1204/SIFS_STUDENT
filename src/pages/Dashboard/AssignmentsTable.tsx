@@ -38,16 +38,6 @@ export const AssignmentsTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const getStatus = (status: any, isCompleted: boolean, isSubmitted: boolean): AssignmentItem["status"] => {
-      const statusStr = status !== undefined && status !== null ? String(status).toLowerCase() : "";
-      if (isCompleted || statusStr === "completed" || statusStr === "complete") {
-        return "Complete";
-      }
-      if (isSubmitted || statusStr === "submitted" || statusStr === "pending") {
-        return "Pending";
-      }
-      return "Not Attempted";
-    };
 
     const fetchAssignments = async () => {
       try {
@@ -57,15 +47,23 @@ export const AssignmentsTable: React.FC = () => {
           const assignmentList = response.data.data.data || response.data.data.assignments || [];
 
           const transformed = assignmentList.map((item: any) => {
-            const hasAttempt = item.question_attempt && item.question_attempt.length > 0;
-            const statusCalc = getStatus(
-              item.assignment_status || item.status,
-              item.is_completed || item.is_checked === 1,
-              item.is_submitted || hasAttempt
-            );
+            const rawStatus = (item.assignment_status || "").toLowerCase();
+            const isComplete = rawStatus === "completed" || rawStatus === "complete" || item.is_completed || item.is_checked === 1 || item.status === 1;
+            const isUpcoming = (item.start_date || item.date) ? new Date(item.start_date || item.date) > new Date() : false;
+            const isDateExpired = (item.end_date || item.due_date) ? new Date(item.end_date || item.due_date) < new Date() : false;
+            const isExpired = !isComplete && (rawStatus === "expired" || rawStatus === "inactive" || (rawStatus !== "active" && isDateExpired));
+
+            let statusCalc: AssignmentItem["status"] = "Pending";
+            if (isComplete) {
+              statusCalc = "Complete";
+            } else if (isExpired) {
+              statusCalc = "Not Attempted";
+            } else {
+              statusCalc = "Pending";
+            }
 
             return {
-              id: item.assignment_id || item.id,
+              id: item.id || item.assignment_id,
               student_assignment_id: item.id,
               course_name: item.course_name || item.course || item.subject_name || item.course_title || "N/A",
               assignment_name: item.assignment_name || item.title || item.assignment_title || item.name || "N/A",
@@ -74,8 +72,8 @@ export const AssignmentsTable: React.FC = () => {
               assignment_status: item.assignment_status || item.status || "Not Attempted",
               status: statusCalc,
               comment: item.comment || "NA",
-              isExpired: (item.end_date || item.due_date) ? new Date(item.end_date || item.due_date) < new Date() : false,
-              isUpcoming: (item.start_date || item.date) ? new Date(item.start_date || item.date) > new Date() : false
+              isExpired: isExpired,
+              isUpcoming: isUpcoming && !isComplete
             };
           });
 

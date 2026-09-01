@@ -137,7 +137,6 @@ const QuestionHeader = ({
   text,
   isExpanded,
   onClick,
-  isMCQ = false,
   isAttempted = true,
   isDark = false
 }: {
@@ -145,14 +144,13 @@ const QuestionHeader = ({
   text: string;
   isExpanded: boolean;
   onClick: () => void;
-  isMCQ?: boolean;
   isAttempted?: boolean;
   isDark?: boolean;
 }) => {
   const headerClasses = isExpanded
     ? isDark
-      ? "bg-gray-700 text-white border-gray-600"
-      : "bg-[#3A3A3A] text-white border-[#3A3A3A]"
+      ? "bg-gray-700 text-white border-gray-600 shadow-sm"
+      : "bg-[#3A3A3A] text-white border-[#3A3A3A] shadow-sm"
     : isDark
       ? "bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700"
       : "bg-white text-gray-900 border-[#E2E2E2] hover:bg-gray-50";
@@ -162,14 +160,21 @@ const QuestionHeader = ({
   return (
     <div
       onClick={onClick}
-      className={`font-semibold text-base leading-none tracking-normal mb-2 rounded-md flex items-center justify-between py-4 px-4 cursor-pointer select-none transition-colors border ${headerClasses}`}
+      className={`font-semibold text-[15px] sm:text-base leading-relaxed tracking-normal mb-2 rounded-md flex items-start justify-between py-3.5 px-4 sm:px-5 cursor-pointer select-none transition-colors border ${headerClasses}`}
     >
-      <span className={isMCQ ? "text-[16px]" : "text-[16px]"}>Q.{qId} {text}</span>
-      <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="flex items-start flex-1 min-w-0 pr-3 sm:pr-4">
+        <span className="flex-shrink-0 font-bold mr-2 whitespace-nowrap">
+          Q.{qId}
+        </span>
+        <span className="flex-1 text-left break-words leading-relaxed font-medium">
+          {text}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 flex-shrink-0 mt-0.5">
         {/* Not Attempted badge on collapsed header */}
         {!isAttempted && !isExpanded && (
           <span
-            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isDark
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${isDark
                 ? "bg-orange-900/40 text-orange-300 border border-orange-700"
                 : "bg-orange-100 text-orange-700 border border-orange-300"
               }`}
@@ -177,7 +182,11 @@ const QuestionHeader = ({
             Not Attempted
           </span>
         )}
-        {isExpanded ? <ChevronDown size={20} className={iconColor} /> : <ChevronRight size={20} className={iconColor} />}
+        {isExpanded ? (
+          <ChevronDown size={20} className={iconColor} />
+        ) : (
+          <ChevronRight size={20} className={iconColor} />
+        )}
       </div>
     </div>
   );
@@ -670,7 +679,6 @@ export default function ExamResultPage() {
                       text={result.question_text || `Question ${globalIndex}`}
                       isExpanded={isExpanded}
                       onClick={() => handleToggle(globalIndex)}
-                      isMCQ={isMCQ}
                       isAttempted={isAttempted}
                       isDark={isDark}
                     />
